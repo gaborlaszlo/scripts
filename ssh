@@ -1,0 +1,10 @@
+#!/bin/bash
+# ssh wrapper with script logging
+PARM="$*"
+ps $PPID| grep -q terminal || exec /usr/bin/ssh $*
+LOG_DIR=/var/log/ssh/$(date +%Y)/$(date +%m)
+[ -d "$LOG_DIR" ] || mkdir -p $LOG_DIR/
+FILE="$LOG_DIR/$(date +%F_%H%M)_${PARM// /_}.$$.log"
+touch $FILE || exit
+#set -x
+exec script -qfe --timing=$FILE.timing --command "/usr/bin/ssh -o StrictHostKeyChecking=no $*" $FILE

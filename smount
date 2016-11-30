@@ -1,0 +1,54 @@
+#!/bin/bash
+# mount equivalent for sshfs
+USAGE='USAGE: smount [-a] [-u [mountpoint]] [user@host:path | pattern]'
+ECHO=echo
+HIST_FILE=~/.smount_history
+MNT_ROOT=/mnt/ssh
+[ -f $HIST_FILE ] || touch $HIST_FILE || exit
+
+sshfs_mount(){
+	mnt=$1
+	u=${1%@*}
+	h_p=${1#*@}
+	h=${h_p%:*}
+	host $h >/dev/null || return $?
+	p=${h_p#*:}
+	mnt_dir=$MNT_ROOT/$h/$u/
+	[ -d "$mnt_dir" ] || sudo mkdir -p $mnt_dir
+	shift
+	if	mount|egrep -q "^$mnt" || sudo sshfs $mnt $mnt_dir -o ssh_command=/usr/bin/ssh -o transform_symlinks -o allow_other -o IdentityFile=~/.ssh/id_rsa -o StrictHostKeyChecking=no $@
+	then	egrep -q "^$mnt$" $HIST_FILE || echo $mnt >> $HIST_FILE
+	fi
+}
+sshfs_umount(){
+	path=$(mount|egrep "^$1"| awk '{print $3}')
+	[ -n "$path" ] && sudo fusermount -u $path
+}
+
+[ $# -eq 0 ] && mount | grep sshfs| sed 's/.* on \(.*\) type .*/smount -u \1/' && exit	# list what's mounted
+call='sshfs_mount'
+while [ -n "$1" ]
+do case "$1" in
+'-h')	echo -e "$USAGE"
+	echo 'Known mounts:'
+	sed 's/^/smount /' $HIST_FILE;;
+'-u')	call='sshfs_umount';;
+'-a')	while read; do $call $REPLY; done <$HIST_FILE;;
+*)	$call $@;;
+esac
+shift
+done
+exit
+
+while getopts ":ahu" opt
+do case $opt in
+h)	echo -e "$USAGE"
+	echo 'Known mounts:'
+	sed 's/^/smount /' $HIST_FILE;;
+u)	call='sshfs_umount';;
+a)	while read; do $call $REPLY; done <$HIST_FILE;;
+[*])	set
+	$call $@;;
+esac
+done
+shift $((OPTIND))

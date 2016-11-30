@@ -1,0 +1,3 @@
+#!/bin/bash
+# umount call for sshfs
+exec smount -u $@

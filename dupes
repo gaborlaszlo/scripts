@@ -1,0 +1,10 @@
+#!/bin/bash
+# find duplicate files in $PWD
+buf=$(mktemp)
+found=$(mktemp)
+md5sum $(find . -type f) | sort | tee $buf | awk '{print $1}' | uniq -c | grep -v ' 1 ' | awk '{print $2}' | sort -u > $found
+for	i in $(<$found)
+do	grep $i $buf
+	echo
+done
+rm $buf $found
