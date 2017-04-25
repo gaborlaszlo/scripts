@@ -4,6 +4,7 @@ USAGE="$0 -i IN_FILE -o OUT_FILE [-p PREFIX]
 Where PREFIX is the path to the definition files: defaults in_definition out_definition (defaults to .)"
 AUTHOR='gabor.laszlo@ieee.org'
 LINE='---------------------------'
+MY_IFS=';'
 
 [ $DEBUG ] && DEBUG_LOG=$(mktemp) && set -x
 LOG_FILE=/var/tmp/${0##*/}.log
@@ -46,7 +47,7 @@ log "$(date '+%F %T') - $PWD - $0 $PARM"
 dos2unix $IN_FILE
 log "$(wc -l $IN_FILE)"
 rm -f $OUT_FILE
-while	IFS=';' read -r $(head -1 $in_definition| tr ';' ' ')
+while	IFS="$MY_IFS" read -r $(head -1 $in_definition| tr "$MY_IFS" ' ')
 do	. $defaults
 	eval "echo -e \"$(egrep -v '^#' $out_definition)\""
 done < $IN_FILE >> $OUT_FILE
