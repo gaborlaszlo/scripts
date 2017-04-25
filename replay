@@ -5,10 +5,10 @@
 LOG_DIR=/var/log/ssh/
 if	[ -f "$1" ]
 then	log="$1"
-else	log=$(find . $LOG_DIR -name "${1##*/}")
+else	log=$(find $LOG_DIR -name "${1##*/}")
 fi
 
-timing=$(find . $LOG_DIR -name "${log##*/}*timing")
+timing=$(find $LOG_DIR -name "${log##*/}*timing")
 [ -z "$timing" ] && echo "no timing for $1 found under . or $LOG_DIR" && exit 1
 dir=${timing%/*}
 file=${timing##*/}
