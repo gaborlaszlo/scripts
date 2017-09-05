@@ -1,5 +1,13 @@
 #!/bin/bash
-# Parse a csv and output processed content based on definitions
+# Parse a csv and output processed content based on definitions:
+# in_definition: ';' separated list of csv field names, no spaces
+#	example: name;phone;birthday
+# defaults:	 bash variable definition style overrides or defaults for inputs
+# 	example: name="${name:-John Doe}" # default
+#		 birthday=1970-01-01 # override
+# out_definition: bash code that evaluates to desired output
+# 	example: [ "$(date +%M-%D)" = "${birthday#*-}" ] && sendsms -n "$phone" --text "Happy birthday, dear $name!"
+
 USAGE="$0 -i IN_FILE -o OUT_FILE [-p PREFIX]
 Where PREFIX is the path to the definition files: defaults in_definition out_definition (defaults to .)"
 AUTHOR='gabor.laszlo@ieee.org'
