@@ -115,6 +115,7 @@ ask(){
 }
 
 # check prefix test message
+# e.g. check 
 check(){
 	for	NAME in $(eval echo \$\{\!${1}\@\})
 	do	VALUE=$(eval echo "\${$NAME}")
@@ -190,7 +191,7 @@ parse_file(){
 		;;
 	esac
 	done
-	shift $(($OPTIND - 1))
+	shift $((OPTIND - 1))
 
 	egrep -v "^$|^$(head -1 $IN_DEF);" $FILE_IN | \
 	while	IFS=';' read -r -a input
@@ -226,7 +227,7 @@ generate_file(){
 		;;
 	esac
 	done
-	shift $(($OPTIND - 1))
+	shift $((OPTIND - 1))
 
 	parse_file -s $SOURCE ${G_DEST:+-d $G_DEST} -a generate || return $?
 	# insert header line if there is HEADER in the out definition
