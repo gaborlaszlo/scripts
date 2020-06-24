@@ -13,7 +13,7 @@ timing=$(find $LOG_DIR -name "${log##*/}*timing")
 dir=${timing%/*}
 file=${timing##*/}
 file=${file%.timing}
-cp $dir/$file /tmp/$file
-awk '{print sqrt($1)," ",$2}' $dir/$file.timing > /tmp/$file.timing
-scriptreplay /tmp/$file.timing /tmp/$file $2
-rm /tmp/$file*
+cp "$dir/$file" "/tmp/$file"
+awk '{print sqrt($1)," ",$2}' "$dir/$file.timing" > "/tmp/$file.timing"
+scriptreplay "/tmp/$file.timing" "/tmp/$file $2"
+rm /tmp/"$file"*
