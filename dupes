@@ -15,8 +15,8 @@ dupes=$prefix.dupes.txt
 [ $REDO ] && [ -f "$md5s" ] && mv "$md5s" "$md5s.bak" || REDO=
 echo -n "finding files... " >&2
 find "$PWD" -type f | grep -Ev 'PMP-Examen|Torrent downloaded from Demonoid' > "$files"
-count=$(cat $files| wc -l)
-echo $count >&2
+count=$(wc -l <"$files")
+echo "$count" >&2
 
 echo "computing checksums... " >&2
 i=1
