@@ -16,10 +16,7 @@ xdo_clickw(){
 	WNAME="$1"
 	TARGET="$2"
 	OFFSET=${3:-20}
-	while	! xdotool search --name "$WNAME"
-	do	sleep 1
-	done
-	eval $(xdotool search --name "$WNAME" getwindowgeometry --shell)
+	eval $(xdo_getwg "$WNAME")
 	case "$TARGET" in
 	'00')	c_x=$OFFSET
 		c_y=$OFFSET
@@ -38,4 +35,12 @@ xdo_clickw(){
 		;;
 	esac
 	xdotool search --name "$WNAME" windowactivate --sync %@ mousemove --sync --window %@ $c_x $c_y click 1
+}
+
+# xdo_type 'window name' 'input'
+xdo_type(){
+	WNAME="$1"
+	shift
+	INPUT="$@"
+	xdotool search --name "$WNAME" windowactivate type "$INPUT"
 }

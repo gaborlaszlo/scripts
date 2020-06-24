@@ -1,10 +1,37 @@
 #!/bin/bash
-# find duplicate files in $PWD
-buf=$(mktemp)
-found=$(mktemp)
-md5sum $(find . -type f) | sort | tee $buf | awk '{print $1}' | uniq -c | grep -v ' 1 ' | awk '{print $2}' | sort -u > $found
-for	i in $(<$found)
-do	grep $i $buf
+# find duplicate files
+# USAGE: $0 [-r] [directory]
+# -r	reuse hashes generated during a previous run
+# 	directory defaults to $PWD
+
+[ "$1" = '-r' ] && REDO=TRUE && shift
+[ -d "$1" ] && cd "$1" && shift
+id=$(echo "$PWD"|md5sum| awk '{print $1}')
+prefix=/tmp/dupes.$id
+files=$prefix.files.txt
+md5s=$prefix.md5s.txt
+dupes=$prefix.dupes.txt
+
+[ $REDO ] && [ -f "$md5s" ] && mv $md5s $md5s.bak || REDO=
+echo -n "finding files... " >&2
+find "$PWD" -type f | egrep -v 'PMP-Examen|Torrent downloaded from Demonoid' > $files
+count=$(cat $files| wc -l)
+echo $count >&2
+
+echo "computing checksums... " >&2
+i=1
+cat $files| \
+while	read file
+do	echo -en "\r$((i++)) / $count" >&2
+	[ $REDO ] && grep " $file" $md5s.bak || md5sum "$file"
+done > $md5s
+
+echo -e "\nfinding duplicates..." >&2
+sort -u $md5s | awk '{print $1}' | uniq -c | grep -v ' 1 ' | awk '{print $2}'|\
+while	read i
+do	grep $i $md5s
 	echo
 done
-rm $buf $found
+#rm -f $md5s.bak
+wc -l "$dupes"
+
