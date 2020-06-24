@@ -21,7 +21,7 @@ FIC_ID=${1:-$FIC_ID}
 shift
 
 mkdir "$FIC_ID"
-cd ./"$FIC_ID"
+cd ./"$FIC_ID" || exit 1
 base_url="https://www.fanfiction.net/s/$FIC_ID/"
 curl -o lastpage.html.gz "$base_url" && gunzip lastpage.html.gz
 #[ $? -gt 0 ] && echo "ERROR" && exit
@@ -33,8 +33,10 @@ else	for	ch in $(grep 'id=chap_select' lastpage.html| tr ' ' '\n'| grep 'value='
 	done
 fi
 rm lastpage.html
-	echo '<!DOCTYPE html><html><head><meta charset='"'utf-8'>" > "$FIC_ID.html"
-	grep '<title>' *.html | uniq >> "$FIC_ID.html"
-	echo '</head><body>' >> "$FIC_ID.html"
-	egrep -h -v 'head>|<title|body>' $(ls *.html| sort -n) >> "$FIC_ID.html"
-	echo '</body></html>' >> "$FIC_ID.html"
+{
+	echo '<!DOCTYPE html><html><head><meta charset='"'utf-8'>"
+	grep '<title>' ./*.html | uniq
+	echo '</head><body>'
+	grep -E -h -v 'head>|<title|body>' $(ls ./*.html| sort -n)
+	echo '</body></html>'
+} > "$FIC_ID.html"
