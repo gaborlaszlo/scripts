@@ -1,7 +1,8 @@
 #!/bin/bash
 # ssh wrapper with script logging
 PARM="$*"
-ps $PPID| grep -q terminal || exec /usr/bin/ssh $*
+ps $PPID
+ps $PPID| egrep -q 'terminal|bash' || exec /usr/bin/ssh $*
 LOG_DIR=/var/log/ssh/$(date +%Y)/$(date +%m)
 [ -d "$LOG_DIR" ] || mkdir -p $LOG_DIR/
 FILE="$LOG_DIR/$(date +%F_%H%M)_${PARM// /_}.$$.log"
