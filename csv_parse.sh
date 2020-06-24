@@ -58,6 +58,6 @@ log $(wc -l "$IN_FILE")
 rm -f "$OUT_FILE"
 while	IFS="$MY_IFS" read -r $(head -1 "$in_definition"| tr "$MY_IFS" ' ')
 do	. "$defaults"
-	eval "echo -e \"$(egrep -v '^#' $out_definition)\""
+	eval "echo -e \"$(grep -Ev '^#' $out_definition)\""
 done < "$IN_FILE" >> "$OUT_FILE"
 die 0 "Finished: $(wc -l $OUT_FILE)"
