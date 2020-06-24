@@ -2,10 +2,10 @@
 # ssh wrapper with script logging
 PARM="$*"
 ps $PPID
-ps $PPID| egrep -q 'terminal|bash' || exec /usr/bin/ssh $*
+ps $PPID| grep -Eq 'terminal|bash' || exec /usr/bin/ssh $*
 LOG_DIR=/var/log/ssh/$(date +%Y)/$(date +%m)
-[ -d "$LOG_DIR" ] || mkdir -p $LOG_DIR/
+[ -d "$LOG_DIR" ] || mkdir -p "$LOG_DIR/"
 FILE="$LOG_DIR/$(date +%F_%H%M)_${PARM// /_}.$$.log"
-touch $FILE || exit
+touch "$FILE" || exit
 #set -x
-exec script -qfe --timing=$FILE.timing --command "/usr/bin/ssh -o StrictHostKeyChecking=no $*" $FILE
+exec script -qfe --timing="$FILE.timing" --command "/usr/bin/ssh -o StrictHostKeyChecking=no $*" "$FILE"
