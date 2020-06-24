@@ -20,7 +20,7 @@ done
 for	((i=0; i<${#LIST_IDS[@]}; i++))
 do	FILTER_IDS="$FILTER_IDS${FILTER_IDS:+; }s/\\([\\&\\?]${LIST_IDS[i]}\\).*\\([\\& ]\\)/\\1XXX\\2/"
 done
-egrep -v "$FILTER_HOSTS" $FILE_IN| \
+grep -Ev "$FILTER_HOSTS" "$FILE_IN"| \
 sed 's/.*\]//; s/ [0-9\.]*$//; s/ -$//'| \
 sed "$FILTER_IDS"| \
 sort |uniq -c | sort -nr
