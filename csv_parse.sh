@@ -17,11 +17,13 @@ MY_IFS=';'
 [ $DEBUG ] && DEBUG_LOG=$(mktemp) && set -x
 LOG_FILE="/var/tmp/${0##*/}.log"
 log(){
-	echo -e "$@" | tee -a "$LOG_FILE" $DEBUG_LOG
+	echo -e "$*" | tee -a "$LOG_FILE" $DEBUG_LOG
 }
 die(){
-	log "Status $1: $2\n$LINE"
-	exit $1
+	status=$1
+	shift
+	log "Status $status: $*\n$LINE"
+	exit $status
 }
 
 # Parse commandline
@@ -47,15 +49,15 @@ for	i in defaults in_definition out_definition
 do	eval $i="$DIR/$i"
 	[ -f "${!i}" ] || die 1 "No $i file found in $DIR!"
 done
-head -1 $in_definition| grep ' ' && die 1 "Space found in in_definition. Please fix definition files."
+head -1 "$in_definition"| grep ' ' && die 1 "Space found in in_definition. Please fix definition files."
 
 # Do the work
 log "$(date '+%F %T') - $PWD - $0 $PARM"
 dos2unix "$IN_FILE"
-log "$(wc -l $IN_FILE)"
+log $(wc -l "$IN_FILE")
 rm -f "$OUT_FILE"
-while	IFS="$MY_IFS" read -r $(head -1 $in_definition| tr "$MY_IFS" ' ')
-do	. $defaults
+while	IFS="$MY_IFS" read -r $(head -1 "$in_definition"| tr "$MY_IFS" ' ')
+do	. "$defaults"
 	eval "echo -e \"$(egrep -v '^#' $out_definition)\""
 done < "$IN_FILE" >> "$OUT_FILE"
 die 0 "Finished: $(wc -l $OUT_FILE)"
