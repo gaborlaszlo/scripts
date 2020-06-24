@@ -21,26 +21,26 @@ xdo_clickw(){
 	'00')	c_x=$OFFSET
 		c_y=$OFFSET
 		;;
-	'X0')	c_x=$(($WIDTH - $OFFSET))
+	'X0')	c_x=$((WIDTH - OFFSET))
 		c_y=$OFFSET
 		;;
 	'0Y')	c_x=$OFFSET
-		c_y=$(($HEIGHT - $OFFSET))
+		c_y=$((HEIGHT - OFFSET))
 		;;
-	'XY')	c_x=$(($WIDTH - $OFFSET))
-		c_y=$(($HEIGHT - $OFFSET))
+	'XY')	c_x=$((WIDTH - OFFSET))
+		c_y=$((HEIGHT - OFFSET))
 		;;
 	*)	c_x=${TARGET%,*}
 		c_y=${TARGET#*,}
 		;;
 	esac
-	xdotool search --name "$WNAME" windowactivate --sync %@ mousemove --sync --window %@ $c_x $c_y click 1
+	xdotool search --name "$WNAME" windowactivate --sync %@ mousemove --sync --window %@ "$c_x" "$c_y" click 1
 }
 
 # xdo_type 'window name' 'input'
 xdo_type(){
 	WNAME="$1"
 	shift
-	INPUT="$@"
+	INPUT="$*"
 	xdotool search --name "$WNAME" windowactivate type "$INPUT"
 }
